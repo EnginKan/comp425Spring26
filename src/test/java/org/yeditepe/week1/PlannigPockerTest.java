@@ -6,11 +6,15 @@ import static org.junit.jupiter.api.Assertions.*;
 
 import net.jqwik.api.*;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.MethodSource;
+
 import static org.assertj.core.api.Assertions.assertThat;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.stream.Stream;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -54,6 +58,23 @@ class PlannigPockerTest {
         List<String> extremes = PlannigPocker.identifyExtremes(input);
         assertThat(extremes).contains("Ayse","Ahmet");
     }
+
+    @ParameterizedTest
+    @MethodSource(value={"data1"})
+    public void testForValidInput(List<Estimate> estimate){
+        List<String> ans= PlannigPocker.identifyExtremes(estimate);
+        assertThat(ans).hasSize(2);
+    }
+
+    public static Stream<List<Estimate>> data1(){
+
+        return Stream.of(List.of(new Estimate("ds",5),
+                                 new Estimate("dm",3)),
+                List.of(new Estimate("dz",2),
+                        new Estimate("dk",8))
+                );
+    }
+
     /*Property Based Testing*/
     @Property
     public void manyEstimates(@ForAll("estimates") List<Estimate> estimates){
@@ -65,6 +86,15 @@ class PlannigPockerTest {
         assertThat(extremes).contains("MaxEstimateOwner","MinEstimateOwner");
 
     }
+
+    @Test
+    public void testWhereBestandWortEqual(){
+        Estimate worst= new Estimate("xxx",3);
+        Estimate best= new Estimate("yyy",3);
+
+        assertThrows(IllegalArgumentException.class,
+                ()->PlannigPocker.identifyExtremes(List.of(worst,best)));
+    }
     @Provide
     public Arbitrary<Estimate> estimates(){
 
@@ -74,8 +104,6 @@ class PlannigPockerTest {
         return  Combinators.combine(names,points)
                 .as((name,point)->
                         new Estimate(name,point));
-
-
 
     }
 

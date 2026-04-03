@@ -13,6 +13,15 @@ public class DiscountCalculatorTest {
         double result = calculator.applyDiscount(100, 0.2);
         assertEquals(80, result);
     }
+    @Test
+    void shouldCheckZeroDiscountRate(){
+        DiscountCalculator calculator = new DiscountCalculator();
+
+        assertThrows(IllegalArgumentException.class,
+                ()->calculator.applyDiscount(0, 0.2)
+        );
+
+    }
 
     @Test
     void shouldThrowExceptionForNegativePrice() {
